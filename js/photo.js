@@ -22,7 +22,7 @@ const pSaveBtn = document.getElementById('p-save-btn');
 const pModeToggleBtn = document.getElementById('p-modeToggle');
 
 function pUpdateModeButton() {
-  pModeToggleBtn.textContent = 'режим атома: ' + modeLabel(pParams.dotMode);
+  pModeToggleBtn.textContent = 'режим: ' + pParams.dotMode;
 }
 
 function pUpdateFit() {
@@ -159,8 +159,7 @@ new p5(function(p) {
     });
 
     ['edgeDots', 'fillDots', 'edgeThresh', 'blurR', 'dotSize'].forEach(function(id) {
-      const el = document.getElementById('p-' + id);
-      const val = document.getElementById('p-' + id + 'V');
+      const el = document.getElementById('p-' + id), val = document.getElementById('p-' + id + 'V');
       el.addEventListener('input', function() {
         pParams[id] = parseFloat(el.value);
         val.textContent = el.value + (id === 'edgeThresh' ? '%' : (id === 'blurR' ? 'px' : ''));
@@ -211,12 +210,13 @@ new p5(function(p) {
       pRedrawDotsPreview(p);
 
       pStatusEl.textContent =
-        'режим атома: ' + modeLabel(pParams.dotMode) +
+        'режим: ' + pParams.dotMode +
         ' · контур: ' + pParams.edgeDots +
         ' · заливка: ' + pParams.fillDots +
-        ' · формат: ' + P_SVG_W + '×' + P_SVG_H;
+        ' · A5: ' + P_SVG_W + '×' + P_SVG_H;
 
       pSaveBtn.disabled = false;
     }, 10);
   };
 });
+
