@@ -12,11 +12,11 @@ cCanvas.height = C_CANVAS_H;
 const cVideo = document.getElementById('c-video');
 const cStatusEl = document.getElementById('c-status');
 const cStartBtn = document.getElementById('c-startBtn');
-const cStopBtn = document.getElementById('c-stopBtn');
 const cModeToggleBtn = document.getElementById('c-modeToggle');
 const cRecordStartBtn = document.getElementById('c-recordStart');
 const cRecordStopBtn = document.getElementById('c-recordStop');
 const cSaveBtn = document.getElementById('c-save-btn');
+let cLastDots = [];
 
 const cProcCanvas = document.createElement('canvas');
 const cProcCtx = cProcCanvas.getContext('2d', { willReadFrequently: true });
@@ -41,14 +41,13 @@ let cFpsDisplay = 0;
 let cFit = { drawW: 0, drawH: 0, offsetX: 0, offsetY: 0 };
 let cProcW = 0, cProcH = 0;
 let cStream = null;
-let cLastDots = [];
 
 let cRecorder = null;
 let cRecordChunks = [];
 let cIsRecording = false;
 
 function cUpdateModeButton() {
-  cModeToggleBtn.textContent = 'режим атома: ' + modeLabel(cParams.dotMode);
+  cModeToggleBtn.textContent = 'режим: ' + cParams.dotMode;
 }
 
 function cUpdateFit(srcW, srcH) {
@@ -114,39 +113,6 @@ function cDrawDot(xA5, yA5, r, alpha) {
   }
 }
 
-function cSaveSVG(dots, w, h) {
-  let paths = '';
-  for (const d of dots) {
-    if (cParams.dotMode === 'stroke') {
-      paths += '<circle cx="' + d.x.toFixed(2) +
-               '" cy="' + d.y.toFixed(2) +
-               '" r="' + d.r.toFixed(2) +
-               '" fill="none" stroke="#000000" stroke-width="' +
-               cParams.strokeW.toFixed(2) + '"/>\n';
-    } else {
-      paths += '<circle cx="' + d.x.toFixed(2) +
-               '" cy="' + d.y.toFixed(2) +
-               '" r="' + d.r.toFixed(2) +
-               '" fill="#000000"/>\n';
-    }
-  }
-
-  const svg =
-    '<?xml version="1.0" encoding="UTF-8"?>\n' +
-    '<svg xmlns="http://www.w3.org/2000/svg" width="' + w +
-    '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">\n' +
-    '<rect width="100%" height="100%" fill="white"/>\n' +
-    paths + '</svg>';
-
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'am-camera-frame.svg';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 function cRenderProcessedFrame() {
   if (!cProcW || !cProcH) return;
   cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
@@ -156,7 +122,6 @@ function cRenderProcessedFrame() {
   const maps = cBuildMapsFromFrame();
   const edgeCDF = maps.edgeCDF;
   const darkCDF = maps.darkCDF;
-  cLastDots = [];
 
   const edgeR = cParams.dotSize * 1.1 / 2;
   for (let k = 0; k < cParams.edgeDots; k++) {
@@ -166,9 +131,7 @@ function cRenderProcessedFrame() {
     const iy = Math.floor(idx / cProcW);
     const xA5 = cFit.offsetX + ((ix + Math.random()) / cProcW) * cFit.drawW;
     const yA5 = cFit.offsetY + ((iy + Math.random()) / cProcH) * cFit.drawH;
-    const dot = { x: xA5, y: yA5, r: edgeR, alpha: 255 };
-    cLastDots.push(dot);
-    cDrawDot(dot.x, dot.y, dot.r, dot.alpha);
+    cDrawDot(xA5, yA5, edgeR, 255);
   }
 
   if (darkCDF) {
@@ -179,13 +142,9 @@ function cRenderProcessedFrame() {
       const iy = Math.floor(idx / cProcW);
       const xA5 = cFit.offsetX + ((ix + Math.random()) / cProcW) * cFit.drawW;
       const yA5 = cFit.offsetY + ((iy + Math.random()) / cProcH) * cFit.drawH;
-      const dot = { x: xA5, y: yA5, r: fillR, alpha: 160 };
-      cLastDots.push(dot);
-      cDrawDot(dot.x, dot.y, dot.r, dot.alpha);
+      cDrawDot(xA5, yA5, fillR, 160);
     }
   }
-
-  cSaveBtn.disabled = cLastDots.length === 0;
 
   cFrameCount++;
   const now = performance.now();
@@ -196,7 +155,7 @@ function cRenderProcessedFrame() {
   }
 
   cStatusEl.textContent =
-    `камера: ${cVideo.videoWidth}×${cVideo.videoHeight} · расчёт: ${cProcW}×${cProcH} · fps: ${cFpsDisplay} · режим атома: ${modeLabel(cParams.dotMode)}${cIsRecording ? ' · запись' : ''}`;
+    `камера: ${cVideo.videoWidth}×${cVideo.videoHeight} · proc: ${cProcW}×${cProcH} · fps: ${cFpsDisplay} · режим: ${cParams.dotMode}${cIsRecording ? ' · запись' : ''}`;
 }
 
 function cOnFrame(now) {
@@ -272,7 +231,6 @@ async function cStartCamera() {
   }
 
   cStartBtn.disabled = true;
-  cStopBtn.disabled = false;
   cRecordStartBtn.disabled = false;
   cRecordStopBtn.disabled = true;
   cStatusEl.textContent = 'поток камеры активен, инициализация...';
@@ -291,11 +249,8 @@ function cStopCamera() {
   cVideo.srcObject = null;
 
   cStartBtn.disabled = false;
-  cStopBtn.disabled = true;
   cRecordStartBtn.disabled = true;
   cRecordStopBtn.disabled = true;
-  cSaveBtn.disabled = true;
-  cLastDots = [];
 
   cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
   cCtx.fillStyle = '#ffffff';
@@ -307,7 +262,6 @@ function cStopCamera() {
 cUpdateModeButton();
 cCtx.fillStyle = '#fff';
 cCtx.fillRect(0, 0, cCanvas.width, cCanvas.height);
-cSaveBtn.disabled = true;
 
 const cIds = ['edgeDots', 'fillDots', 'edgeThresh', 'blurR', 'dotSize', 'strokeW', 'targetFps', 'procMax'];
 for (const id of cIds) {
@@ -343,11 +297,6 @@ cModeToggleBtn.addEventListener('click', () => {
 });
 
 cStartBtn.addEventListener('click', cStartCamera);
-cStopBtn.addEventListener('click', cStopCamera);
-
-cSaveBtn.addEventListener('click', () => {
-  if (cLastDots.length > 0) cSaveSVG(cLastDots, C_SVG_W, C_SVG_H);
-});
 
 cRecordStartBtn.addEventListener('click', () => {
   if (cIsRecording) return;
@@ -418,3 +367,4 @@ cRecordStopBtn.addEventListener('click', () => {
     cStopRecordingIfNeeded();
   }
 });
+
