@@ -1,4 +1,6 @@
-function gaussianBlur(gray, w, h, radius) {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+  function gaussianBlur(gray, w, h, radius) {
   if (radius <= 0) return gray;
   const sigma = Math.max(0.1, radius / 2);
   const size = radius * 2 + 1;
