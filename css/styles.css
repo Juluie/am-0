@@ -126,3 +126,184 @@
 
   #v-video, #c-video { display: none; }
 </style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="modeTabs">
+    <button class="tab-btn" id="tabVideoBtn">видеопоток</button>
+    <button class="tab-btn active" id="tabPhotoBtn">изображение</button>
+    <button class="tab-btn" id="tabCameraBtn">камера</button>
+  </div>
+
+  <div class="panel" id="photoPanel">
+    <button onclick="document.getElementById('p-fi').click()">загрузить изображение</button>
+    <input type="file" id="p-fi" accept="image/*" style="display:none">
+
+    <button id="p-modeToggle">режим атома: заливка</button>
+    <button id="p-save-btn" disabled>сохранить SVG</button>
+
+    <label>
+      <div class="label-line"><span>плотность контура</span><span id="p-edgeDotsV">8000</span></div>
+      <input type="range" id="p-edgeDots" min="100" max="10000" step="200" value="8000">
+    </label>
+
+    <label>
+      <div class="label-line"><span>плотность заливки</span><span id="p-fillDotsV">100</span></div>
+      <input type="range" id="p-fillDots" min="0" max="10000" step="100" value="100">
+    </label>
+
+    <label>
+      <div class="label-line"><span>чёткость контура</span><span id="p-edgeThreshV">20%</span></div>
+      <input type="range" id="p-edgeThresh" min="5" max="60" step="1" value="20">
+    </label>
+
+    <label>
+      <div class="label-line"><span>размытие контура</span><span id="p-blurRV">3px</span></div>
+      <input type="range" id="p-blurR" min="1" max="20" step="1" value="3">
+    </label>
+
+    <label>
+      <div class="label-line"><span>радиус атома</span><span id="p-dotSizeV">2.5</span></div>
+      <input type="range" id="p-dotSize" min="1" max="8" step="0.5" value="2.5">
+    </label>
+
+    <label>
+      <div class="label-line"><span>толщина контура</span><span id="p-strokeWV">1.2</span></div>
+      <input type="range" id="p-strokeW" min="0.3" max="4" step="0.1" value="1.2">
+    </label>
+
+    <div class="status" id="p-status">загрузите изображение</div>
+  </div>
+
+  <div class="panel" id="videoPanel" style="display:none">
+    <button onclick="document.getElementById('v-fi').click()">загрузить видеопоток</button>
+    <input type="file" id="v-fi" accept="video/*" style="display:none">
+
+    <div class="row-btns">
+      <button id="v-playBtn" disabled>пуск</button>
+      <button id="v-pauseBtn" disabled>пауза</button>
+    </div>
+
+    <button id="v-modeToggle">режим атома: заливка</button>
+
+    <div class="row-btns">
+      <button id="v-recordStart" disabled>записать</button>
+      <button id="v-recordStop" disabled>остановить</button>
+    </div>
+
+    <label>
+      <div class="label-line"><span>плотность контура</span><span id="v-edgeDotsV">4200</span></div>
+      <input type="range" id="v-edgeDots" min="200" max="12000" step="200" value="4200">
+    </label>
+
+    <label>
+      <div class="label-line"><span>плотность заливки</span><span id="v-fillDotsV">1200</span></div>
+      <input type="range" id="v-fillDots" min="0" max="12000" step="100" value="1200">
+    </label>
+
+    <label>
+      <div class="label-line"><span>чёткость контура</span><span id="v-edgeThreshV">22%</span></div>
+      <input type="range" id="v-edgeThresh" min="5" max="60" step="1" value="22">
+    </label>
+
+    <label>
+      <div class="label-line"><span>размытие контура</span><span id="v-blurRV">3px</span></div>
+      <input type="range" id="v-blurR" min="1" max="10" step="1" value="3">
+    </label>
+
+    <label>
+      <div class="label-line"><span>радиус атома</span><span id="v-dotSizeV">2.2</span></div>
+      <input type="range" id="v-dotSize" min="0.8" max="8" step="0.2" value="2.2">
+    </label>
+
+    <label>
+      <div class="label-line"><span>толщина контура</span><span id="v-strokeWV">1.0</span></div>
+      <input type="range" id="v-strokeW" min="0.2" max="4" step="0.1" value="1.0">
+    </label>
+
+    <label>
+      <div class="label-line"><span>частота кадров</span><span id="v-targetFpsV">10</span></div>
+      <input type="range" id="v-targetFps" min="4" max="24" step="1" value="10">
+    </label>
+
+    <label>
+      <div class="label-line"><span>размер расчёта</span><span id="v-procMaxV">520</span></div>
+      <input type="range" id="v-procMax" min="240" max="2000" step="40" value="520">
+    </label>
+
+    <div class="status" id="v-status">загрузи видеопоток — обработка идёт вживую, результат можно записать</div>
+  </div>
+
+  <div class="panel" id="cameraPanel" style="display:none">
+    <div class="row-btns">
+      <button id="c-startBtn">включить камеру</button>
+      <button id="c-stopBtn" disabled>остановить камеру</button>
+    </div>
+
+    <button id="c-modeToggle">режим атома: заливка</button>
+
+    <div class="row-btns">
+      <button id="c-recordStart" disabled>записать</button>
+      <button id="c-recordStop" disabled>остановить</button>
+    </div>
+
+    <button id="c-save-btn" disabled>сохранить SVG</button>
+
+    <label>
+      <div class="label-line"><span>плотность контура</span><span id="c-edgeDotsV">4200</span></div>
+      <input type="range" id="c-edgeDots" min="200" max="12000" step="200" value="4200">
+    </label>
+
+    <label>
+      <div class="label-line"><span>плотность заливки</span><span id="c-fillDotsV">1200</span></div>
+      <input type="range" id="c-fillDots" min="0" max="12000" step="100" value="1200">
+    </label>
+
+    <label>
+      <div class="label-line"><span>чёткость контура</span><span id="c-edgeThreshV">22%</span></div>
+      <input type="range" id="c-edgeThresh" min="5" max="60" step="1" value="22">
+    </label>
+
+    <label>
+      <div class="label-line"><span>размытие контура</span><span id="c-blurRV">3px</span></div>
+      <input type="range" id="c-blurR" min="1" max="10" step="1" value="3">
+    </label>
+
+    <label>
+      <div class="label-line"><span>радиус атома</span><span id="c-dotSizeV">2.2</span></div>
+      <input type="range" id="c-dotSize" min="0.8" max="8" step="0.2" value="2.2">
+    </label>
+
+    <label>
+      <div class="label-line"><span>толщина контура</span><span id="c-strokeWV">1.0</span></div>
+      <input type="range" id="c-strokeW" min="0.2" max="4" step="0.1" value="1.0">
+    </label>
+
+    <label>
+      <div class="label-line"><span>частота кадров</span><span id="c-targetFpsV">10</span></div>
+      <input type="range" id="c-targetFps" min="4" max="24" step="1" value="10">
+    </label>
+
+    <label>
+      <div class="label-line"><span>размер расчёта</span><span id="c-procMaxV">520</span></div>
+      <input type="range" id="c-procMax" min="240" max="2000" step="40" value="520">
+    </label>
+
+    <div class="status" id="c-status">активируй камеру — поток будет атомизироваться в реальном времени</div>
+  </div>
+</div>
+
+<div id="stage">
+  <div class="stage-view" id="photoStage"></div>
+
+  <div class="stage-view" id="videoStage" style="display:none">
+    <canvas id="v-view"></canvas>
+    <video id="v-video" playsinline muted crossorigin="anonymous"></video>
+  </div>
+
+  <div class="stage-view" id="cameraStage" style="display:none">
+    <canvas id="c-view"></canvas>
+    <video id="c-video" playsinline muted autoplay></video>
+  </div>
+</div>
