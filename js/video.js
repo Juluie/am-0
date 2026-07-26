@@ -45,7 +45,7 @@ let vRecordChunks = [];
 let vIsRecording = false;
 
 function vUpdateModeButton() {
-  vModeToggleBtn.textContent = 'режим атома: ' + modeLabel(vParams.dotMode);
+  vModeToggleBtn.textContent = 'режим: ' + vParams.dotMode;
 }
 
 function vUpdateFit(srcW, srcH) {
@@ -153,7 +153,7 @@ function vRenderProcessedFrame() {
   }
 
   vStatusEl.textContent =
-    `видеопоток: ${vVideo.videoWidth}×${vVideo.videoHeight} · расчёт: ${vProcW}×${vProcH} · fps: ${vFpsDisplay} · режим атома: ${modeLabel(vParams.dotMode)}${vIsRecording ? ' · запись' : ''}`;
+    `видеопоток: ${vVideo.videoWidth}×${vVideo.videoHeight} · proc: ${vProcW}×${vProcH} · fps: ${vFpsDisplay} · режим: ${vParams.dotMode}${vIsRecording ? ' · запись' : ''}`;
 }
 
 function vOnVideoFrame(now) {
@@ -361,3 +361,4 @@ vRecordStopBtn.addEventListener('click', () => {
     vStopRecordingIfNeeded();
   }
 });
+
