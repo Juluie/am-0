@@ -91,36 +91,55 @@ function pRedrawDotsPreview(p) {
 }
 
 function pSaveSVG(dots, w, h) {
+  if (!dots || !dots.length) {
+    pStatusEl.textContent = 'нет точек для сохранения';
+    return;
+  }
+
   let paths = '';
+
   for (const d of dots) {
+    if (!isFinite(d.x) || !isFinite(d.y) || !isFinite(d.r)) continue;
+
     if (pParams.dotMode === 'stroke') {
-      paths += '<circle cx="' + d.x.toFixed(2) +
-               '" cy="' + d.y.toFixed(2) +
-               '" r="' + d.r.toFixed(2) +
-               '" fill="none" stroke="#000000" stroke-width="' +
-               pParams.strokeW.toFixed(2) + '"/>\n';
+      paths += `<circle cx="${d.x.toFixed(2)}"
+                        cy="${d.y.toFixed(2)}"
+                        r="${Math.max(0.01, d.r).toFixed(2)}"
+                        fill="none"
+                        stroke="#000000"
+                        stroke-width="${pParams.strokeW.toFixed(2)}"
+                        stroke-opacity="${((d.alpha ?? 255) / 255).toFixed(3)}" />\n`;
     } else {
-      paths += '<circle cx="' + d.x.toFixed(2) +
-               '" cy="' + d.y.toFixed(2) +
-               '" r="' + d.r.toFixed(2) +
-               '" fill="#000000"/>\n';
+      paths += `<circle cx="${d.x.toFixed(2)}"
+                        cy="${d.y.toFixed(2)}"
+                        r="${Math.max(0.01, d.r).toFixed(2)}"
+                        fill="#000000"
+                        fill-opacity="${((d.alpha ?? 255) / 255).toFixed(3)}" />\n`;
     }
   }
 
   const svg =
-    '<?xml version="1.0" encoding="UTF-8"?>\n' +
-    '<svg xmlns="http://www.w3.org/2000/svg" width="' + w +
-    '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">\n' +
-    paths + '</svg>';
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<svg xmlns="http://www.w3.org/2000/svg"
+          width="${w}"
+          height="${h}"
+          viewBox="0 0 ${w} ${h}">\n` +
+    `${paths}` +
+    `</svg>`;
 
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
+
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'am-0.svg';
+  a.download = 'am-0-transparent.svg';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
 
 
 new p5(function(p) {
