@@ -111,7 +111,6 @@ function pSaveSVG(dots, w, h) {
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg xmlns="http://www.w3.org/2000/svg" width="' + w +
     '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">\n' +
-    '<rect width="100%" height="100%" fill="white"/>\n' +
     paths + '</svg>';
 
   const blob = new Blob([svg], { type: 'image/svg+xml' });
@@ -122,6 +121,7 @@ function pSaveSVG(dots, w, h) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
 
 new p5(function(p) {
   p.setup = function() {
